@@ -11,18 +11,18 @@ class Repository:
         self.githublink = 'https://github.com/'+repopath
         self.apilink = 'https://api.github.com/repos/' + repopath
         self.repoinfo = repopath.split('/')
-     
-        #self.repoinfoJSON = self.getRepInfoasJSON() 
-        #self.forked_count = self.repoinfoJSON['forks_count']
-    
 
-    
+        #self.repoinfoJSON = self.getRepInfoasJSON()
+        #self.forked_count = self.repoinfoJSON['forks_count']
+
+
+
     def scrapeRepoInfo(self,repoinfo):
-        
+
         reponame = repoinfo['full_name']
         ownername = repoinfo['owner']['login']
         commitinfodict ={'ahead':-1, 'behind':-1, 'files_ahead':-1 ,'files_behind':-1}
-        
+
         link='https://github.com/' + reponame
         repohtml = requests.get(link).text
         reposoup = BeautifulSoup(repohtml, 'lxml')
@@ -36,7 +36,7 @@ class Repository:
                     commitinfodict[infokey] = diff_info_line.split(infokey)[0].split()[-2]
                 else:
                     commitinfodict[infokey] = 0
-        
+
         except:
             pass
 
@@ -51,24 +51,21 @@ class Repository:
 
     def getForkedRepos(self):
         #print(self.apilink)
-        self.forkedrespjson = requests.get(self.apilink+'/forks?sort=stargazers&per_page=100').json()
-  
-        
+        self.forkedrespjson = requests.get(self.apilink+'/forks').json()
+
+
         if('message' in self.forkedrespjson):
             pass
-        else: 
+        else:
             self.repoowner =  self.repoinfo[0]
             self.reponame = self.repoinfo[1]
             with Pool(25) as p:
                 forkedrespjsonitr = p.imap_unordered(self.scrapeRepoInfo,self.forkedrespjson)
                 self.forkedrespjson = [repo for repo in forkedrespjsonitr if repo]
-  
+
             # self.commitinfo ={}
             # for repoinfo in self.forkedrespjson:
             #     reponame = repoinfo['full_name']
             #     self.commitinfo[reponame]= self.scrapeRepoInfo('https://github.com/' + reponame)
             #     for k in self.commitinfo[reponame]:
             #         repoinfo[k] = self.commitinfo[reponame][k]
-
-
-

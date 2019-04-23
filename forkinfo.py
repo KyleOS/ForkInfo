@@ -26,7 +26,7 @@ def forkedrepos(reponame):
     else:
         return render_template('forks.html', cuur_repo_list= repoobj.forkedrespjson, parent_user = repo_owner)
     #return render_template('forks.html', cuur_repo_list= repoobj.commitinfo)
- 
+
 @app.route('/forks', methods =['GET','POST'])
 def forks():
     if(request.method == "GET"):
@@ -34,5 +34,3 @@ def forks():
     else:
         repoin = request.form.get('repo')
         return redirect(url_for('forkedrepos',reponame=repoin))
-
-    
